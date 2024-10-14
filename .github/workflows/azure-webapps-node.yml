@@ -4,16 +4,16 @@ on:
   push:
     branches:
       - main
-      - master  # Added 'master' branch for push events
+      - master  # Trigger on push to 'main' and 'master' branches
   pull_request:
     branches:
       - main
-      - master  # Added 'master' branch for pull request events
+      - master  # Trigger on pull requests to 'main' and 'master' branches
   workflow_dispatch:  # Allow manual triggering of the workflow
 
 env:
-  AZURE_WEBAPP_NAME: CoffeShop  # Set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'  # Set this to the path to your web app project, defaults to the repository root
+  AZURE_WEBAPP_NAME: CoffeShop  # Name of your Azure Web App
+  AZURE_WEBAPP_PACKAGE_PATH: './'  # Path to your web app project; adjust if it's not in the root
 
 permissions:
   contents: read
@@ -21,6 +21,7 @@ permissions:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,11 +29,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'  # Specify the Node.js version if necessary
+          node-version: '20.x'  # Specify the Node.js version you need
 
       - name: Install Build Dependencies
         run: |
-          npm install browserify --no-save  # Install only browserify without saving to package.json
+          npm install
 
       - name: Build the project
         run: |
@@ -43,5 +44,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_CLIENTID_COFFE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISH_PROFILE }}
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
